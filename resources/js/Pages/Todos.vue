@@ -241,13 +241,13 @@ onMounted(async () => {
                                 <label
                                     for="edit-modal"
                                     class="btn btn-primary"
-                                    @click.prevent="updateTodo(state.modal)"
+                                    @click="updateTodo(state.modal)"
                                     >Update</label
                                 >
                                 <label
                                     for="edit-modal"
                                     class="btn btn-secondary"
-                                    >Close</label
+                                    >Cancel</label
                                 >
                             </div>
                         </div>
