@@ -12,6 +12,7 @@ const state = reactive({
     modal: {},
     apiResponse: {},
 });
+
 async function createTodo(todo) {
     if (confirm("Are you sure you want to add " + todo.title + "?")) {
         await axios
@@ -25,15 +26,21 @@ async function createTodo(todo) {
                     })
             );
         if (state.apiResponse.success == true) {
-            window.location.reload();
+            state.todos.push({ ...state.apiResponse.data });
+            state.todo = {
+                title: "",
+                description: "",
+            };
         }
     }
 }
+
 function passTodoToModal(todo) {
     state.modal = {
         ...todo,
     };
 }
+
 async function updateTodo(todo) {
     await axios
         .put("api/todos/" + todo.id, todo)
@@ -46,7 +53,8 @@ async function updateTodo(todo) {
                 })
         );
     if (state.apiResponse.success == true) {
-        window.location.reload();
+        state.todos.splice(state.todos.indexOf(todo), 1);
+        state.todos.push({ ...todo });
     }
 }
 async function deleteTodo(todo) {
@@ -57,12 +65,12 @@ async function deleteTodo(todo) {
             .catch(
                 (err) =>
                     (state.apiResponse = {
-                        message: "Field required.",
+                        message: "Already deleted please refresh the page.",
                         success: false,
                     })
             );
         if (state.apiResponse.success == true) {
-            window.location.reload();
+            state.todos.splice(state.todos.indexOf(todo), 1);
         }
     }
 }
@@ -239,7 +247,7 @@ onMounted(async () => {
                                 <label
                                     for="edit-modal"
                                     class="btn btn-secondary"
-                                    >Cancel</label
+                                    >Close</label
                                 >
                             </div>
                         </div>
