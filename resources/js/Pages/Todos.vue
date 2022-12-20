@@ -10,11 +10,23 @@ const state = reactive({
         description: "",
     },
     modal: {},
+    apiResponse: {},
 });
 async function createTodo(todo) {
     if (confirm("Are you sure you want to add " + todo.title + "?")) {
-        await axios.post("api/todos", todo);
-        window.location.reload();
+        await axios
+            .post("api/todos", todo)
+            .then((res) => (state.apiResponse = { ...res.data }))
+            .catch(
+                (err) =>
+                    (state.apiResponse = {
+                        message: "Field required.",
+                        success: false,
+                    })
+            );
+        if (state.apiResponse.success == true) {
+            window.location.reload();
+        }
     }
 }
 function passTodoToModal(todo) {
@@ -23,13 +35,35 @@ function passTodoToModal(todo) {
     };
 }
 async function updateTodo(todo) {
-    await axios.put("api/todos/" + todo.id, todo);
-    window.location.reload();
+    await axios
+        .put("api/todos/" + todo.id, todo)
+        .then((res) => (state.apiResponse = { ...res.data }))
+        .catch(
+            (err) =>
+                (state.apiResponse = {
+                    message: "Field required.",
+                    success: false,
+                })
+        );
+    if (state.apiResponse.success == true) {
+        window.location.reload();
+    }
 }
 async function deleteTodo(todo) {
     if (confirm("Are you sure you want to delete " + todo.title + "?")) {
-        await axios.delete("api/todos/" + todo.id);
-        window.location.reload();
+        await axios
+            .delete("api/todos/" + todo.id)
+            .then((res) => (state.apiResponse = { ...res.data }))
+            .catch(
+                (err) =>
+                    (state.apiResponse = {
+                        message: "Field required.",
+                        success: false,
+                    })
+            );
+        if (state.apiResponse.success == true) {
+            window.location.reload();
+        }
     }
 }
 onMounted(async () => {
@@ -46,10 +80,35 @@ onMounted(async () => {
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <div class="navbar bg-white">
+                    <div class="navbar bg-white mb-3">
                         <a class="btn btn-ghost normal-case text-5xl">Todos</a>
                     </div>
-                    <div class="flex mb-5">
+                    <div
+                        v-show="state.apiResponse.message"
+                        :class="
+                            state.apiResponse.success
+                                ? 'alert alert-success shadow-lg'
+                                : 'alert alert-error shadow-lg'
+                        "
+                    >
+                        <div>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="stroke-current flex-shrink-0 h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+                            <span>{{ state.apiResponse.message }}</span>
+                        </div>
+                    </div>
+                    <div class="flex my-5">
                         <input
                             type="text"
                             v-model="state.todo.title"
@@ -84,8 +143,8 @@ onMounted(async () => {
                         <table class="table w-full">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Address</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

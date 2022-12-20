@@ -77,7 +77,12 @@ class TodoController extends Controller
                 'description' => $request->description,
             ]);
 
-            return response()->json($todo, 200);
+            return response()->json([
+                'success' => true,
+                'message' => 'Todo successfully updated.',
+                'data' => $todo,
+            ],
+            200);
         }
         return response()->json(
             [
